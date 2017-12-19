@@ -1,0 +1,14 @@
+https://www.pyimagesearch.com/2014/01/20/basic-image-manipulations-in-python-and-opencv-resizing-scaling-rotating-and-cropping/
+
+https://www.pyimagesearch.com/2016/07/25/convolutions-with-opencv-and-python/
+
+https://www.pyimagesearch.com/2014/12/01/complete-guide-building-image-search-engine-python-opencv/
+
+https://www.pyimagesearch.com/2016/09/26/a-simple-neural-network-with-python-and-keras/
+
+https://www.pyimagesearch.com/2017/10/16/raspberry-pi-deep-learning-object-detection-with-opencv/
+
+bd: http://ieeexplore.ieee.org/Xplore/home.jsp
+
+http://www.sciencedirect.com/
+ScienceDirect is the world's leading source for scientific, technical, and medical research. Explore journals, books and articles.

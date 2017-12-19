@@ -9,6 +9,51 @@ from cv2 import (
 )
 from mimetypes import guess_type
 
+
+class Bbox(object):
+	#(x, y), (x+w, y+h)
+	"""
+	First Row: number of images => deleted
+	Second Row: entry names 	=> deleted
+
+	Rest of the Rows: <image_id> <bbox_locations>
+
+	<bbox_locations> => x1 y1 width height	
+	"""
+	def __init__(self, coords):
+		#coords = list
+		self.name = coords[0]
+		self.x_1 = int(coords[1])
+		self.y_1 = int(coords[2])
+		self.x_2 = self.x_1 + int(coords[3])
+		self.y_2 = self.y_1 + int(coords[4])
+
+	@property
+	def pt1(self):
+		return (self.x_1, self.y_1)
+
+	@property
+	def pt2(self):
+		return (self.x_2, self.y_2)
+
+
+def get_bboxes(file_dir):
+	bboxes = []
+	file = open(file_dir, "r")
+	data = file.readlines()
+	file.close()
+	
+	del data[:2]
+	
+	coords = map(lambda x: x.split(), data)
+	
+	for item in coords:
+		bboxes.append(Bbox(item))
+	
+	return bboxes
+
+
+
 def img_list(folder_dir):
 	"""
 	Given a folder_dir return a list with the true path

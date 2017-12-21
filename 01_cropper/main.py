@@ -18,13 +18,13 @@ import numpy as np
 js = json.load(open("db.json"))
 
 bbox = util.get_bboxes(js["bbox_dir"].encode())
-
 base = js["base"]
 cont = js["last_cont"] # save this, indica el contador de imagenes en donde quedaste
 min_images = js["min_images"]
 max_images = js["max_images"]
 
 print "loading..."
+cropped_js = json.load(open(js["cropped_js"].encode()))
 images_path = util.img_list(js["db_dir"].encode())
 images = util.get_images(images_path[min_images:max_images])
 bbox_portion = bbox[min_images:max_images]
@@ -176,11 +176,13 @@ while True:
 		print "done"
 
 	elif key == util.key_enter: # enter
-		# guardar imagen recortada
+		# guardar nombre x1 y1 x2 y2
 		try:
 			x1, y1 = util.refPt[0]
 			x2, y2 = util.refPt[1]
+			
 			crop = images[cont][y1:y2, x1:x2]
+			
 			cv2.imshow("aux", images[cont][y1:y2, x1:x2])
 			aux_key = cv2.waitKey(0)
 			im_dir = images_path[cont+min_images]
@@ -189,8 +191,20 @@ while True:
 			save_dir = js["cropped_dir"].encode()+im_name+"_cropped"+im_extension
 			
 			if aux_key == util.key_enter:
-				print "image " + im_dir + " saved"
-				cv2.imwrite(save_dir, crop)
+				print "coords of the image " + im_dir + " saved"
+				# cv2.imwrite(save_dir, crop)
+				
+				list_names = map(lambda x: x["name"], cropped_js)
+
+				if im_name+im_extension not in list_names:
+					cropped_js.append({"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2})
+				else:
+					option = raw_input("existing image. Do you want to overwrite it? (y/n): ")
+					if option.lower() == 'y':
+						ind = list_names.index(im_name+im_extension)
+						cropped_js[ind] = {"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2}
+				
+				json.dump(cropped_js, open(js["cropped_js"].encode(), "w"))
 				cv2.destroyWindow("aux")
 			else:
 				cv2.destroyWindow("aux")
@@ -215,8 +229,20 @@ while True:
 			save_dir = js["cropped_dir"].encode()+im_name+"_cropped"+im_extension
 			
 			if aux_key == util.key_enter:
-				print "original crop saved"
-				cv2.imwrite(save_dir, crop)
+				print "original coords of the crop saved. image " + save_dir
+				# cv2.imwrite(save_dir, crop)
+				
+				list_names = map(lambda x: x["name"], cropped_js)
+
+				if im_name+im_extension not in list_names:
+					cropped_js.append({"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2})
+				else:
+					option = raw_input("existing image. Do you want to overwrite it? (y/n): ")
+					if option.lower() == 'y':
+						ind = list_names.index(im_name+im_extension)
+						cropped_js[ind] = {"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2}
+				
+				json.dump(cropped_js, open(js["cropped_js"].encode(), "w"))
 				cv2.destroyWindow("aux")
 			else:
 				cv2.destroyWindow("aux")
@@ -230,6 +256,7 @@ while True:
 		js["min_images"] = min_images
 		js["max_images"] = max_images
 		json.dump(js, open("db.json", "w"))
+		#json.dump(cropped_js, open(js["cropped_js"].encode(), "w"))
 		cv2.destroyAllWindows()
 
 		print "\nbye"
@@ -250,6 +277,10 @@ o key => save original crop
 enter key => crop and save the image
 		  => in the new window, enter save the image, another key goes out
 esc key => quit without save
+
+remember json:
+	- cropped_dir: where cropped images are going to be saved
+	- db_dir: dir of the images
 
 
 """

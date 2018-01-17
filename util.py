@@ -90,6 +90,9 @@ key_down = 2621440
 key_left = 2424832
 key_enter = 13
 key_esc = 27
+key_a = 97
+key_d = 100
+key_w = 119
  
 def click_and_crop(event, x, y, flags, param):
 	

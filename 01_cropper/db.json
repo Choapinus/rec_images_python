@@ -1,1 +1,1 @@
-{"max_images": 20, "min_images": 10, "cropped_dir": "../celebA/cropped/", "cropped_js": "../celebA/cropped/img_crops.json", "last_cont": 6, "base": 10, "db_dir": "../celebA/img_celeba", "bbox_dir": "../celebA/Anno/list_bbox_celeba.txt"}
+{"max_images": 810, "min_images": 800, "cropped_dir": "../Imagenes_Viaje1/berries_malos7/cropped_img/", "cropped_js": "../Imagenes_Viaje1/berries_malos7/img_crops.json", "last_cont": 4, "base": 10, "db_dir": "../Imagenes_Viaje1/berries_malos7/berries/", "bbox_dir": ""}

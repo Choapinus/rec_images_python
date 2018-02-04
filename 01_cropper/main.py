@@ -7,6 +7,8 @@ idea: if waitkey == somekey, x: x rectangulos a dibujar con un for i in range(x)
 parametrizar carga de bboxes
 crear archivo de instrucciones
 no depender de la base de datos celebA
+
+hacer los clicks para tener las coordenadas, no arrastrar
 """
 
 
@@ -70,7 +72,7 @@ while True:
 			print images[cont]
 			#print bbox_portion[cont]
 
-		util.refPt = []
+		#util.refPt = []
 	
 	#elif key == util.key_left:
 	elif key == util.key_a:
@@ -90,11 +92,12 @@ while True:
 			print images[cont]
 			#print bbox_portion[cont]
 
-		util.refPt = []
+		#util.refPt = []
 	
 	elif key == ord("r"):
 		# resetear a valores originales
 		try:
+			util.refPt = []
 			actual_im = images[cont]
 			#clone_im = images[cont].copy()
 			#bbox_im = bbox_portion[cont]
@@ -193,7 +196,7 @@ while True:
 			cv2.imshow("aux", images[cont][y1:y2, x1:x2])
 			aux_key = cv2.waitKey(0)
 			im_dir = images_path[cont+min_images]
-			im_name = im_dir.split(js["db_dir"].encode())[-1][1:-4]
+			im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
 			im_extension = ".png"
 			save_dir = js["cropped_dir"].encode()+im_name+"_cropped"+im_extension
 			
@@ -215,6 +218,7 @@ while True:
 				cv2.destroyWindow("aux")
 				print "coords of the image " + im_dir + " saved"
 			else:
+				util.refPt = []
 				cv2.destroyWindow("aux")
 				cv2.imshow("cropper", images[cont])
 
@@ -300,5 +304,6 @@ remember json:
 
 preguntas:
 - que pasa si en el clasificador de arandanos aparece una pelota morada?
+- todas las capturas de arandanos poseen rayas por detras. Estas intervendran en el reconocimiento?
 
 """

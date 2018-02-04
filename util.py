@@ -103,11 +103,13 @@ def click_and_crop(event, x, y, flags, param):
 	# (x, y) coordinates and indicate that cropping is being
 	# performed
 	if event == EVENT_LBUTTONDOWN:
+	#if event == EVENT_LBUTTONDOWN and len(refPt) == 0:
 		refPt = [(x, y)]
 		cropping = True
  
 	# check to see if the left mouse button was released
 	elif event == EVENT_LBUTTONUP:
+	# elif event == EVENT_LBUTTONDOWN and len(refPt) > 0:
 		# record the ending (x, y) coordinates and indicate that
 		# the cropping operation is finished
 		refPt.append((x, y))

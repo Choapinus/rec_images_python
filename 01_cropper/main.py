@@ -40,13 +40,22 @@ cv2.namedWindow("cropper")
 #cv2.namedWindow("original")
 
 #bbox_im = bbox_portion[cont]
-actual_im = images[cont]
+actual_im = images[cont].copy()
 #clone_im = images[cont].copy()
 #cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
+
+list_names = map(lambda x: x["name"], cropped_js)
+actual_img_name = images_path[cont+min_images].split('/')[-1]
+
+if actual_img_name in list_names:
+	cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
 
 cv2.setMouseCallback("cropper", util.click_and_crop)
 cv2.imshow("cropper", actual_im)
 #cv2.imshow("original", clone_im)
+
+
 
 
 while True:
@@ -60,10 +69,16 @@ while True:
 		if cont == len(images):
 			cont = 0 # ni se te ocurra poner = min_images porque explota, recuerda que sobreescribes la lista
 		try:
-			actual_im = images[cont]
+			actual_im = images[cont].copy()
 			#clone_im = images[cont].copy()
 			#bbox_im = bbox_portion[cont]
 			#cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
+			list_names = map(lambda x: x["name"], cropped_js)
+			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			
+			if actual_img_name in list_names:
+				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
 			cv2.imshow("cropper", actual_im)
 			#cv2.imshow("original", clone_im)
 
@@ -80,10 +95,16 @@ while True:
 		if cont == -1:
 			cont = len(images)-1
 		try:
-			actual_im = images[cont]
+			actual_im = images[cont].copy()
 			#clone_im = images[cont].copy()
 			#bbox_im = bbox_portion[cont]
 			#cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
+			list_names = map(lambda x: x["name"], cropped_js)
+			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			
+			if actual_img_name in list_names:
+				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
 			cv2.imshow("cropper", actual_im)
 			#cv2.imshow("original", clone_im)
 
@@ -98,10 +119,16 @@ while True:
 		# resetear a valores originales
 		try:
 			util.refPt = []
-			actual_im = images[cont]
+			actual_im = images[cont].copy()
 			#clone_im = images[cont].copy()
 			#bbox_im = bbox_portion[cont]
 			#cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
+			list_names = map(lambda x: x["name"], cropped_js)
+			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			
+			if actual_img_name in list_names:
+				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
 			cv2.imshow("cropper", actual_im)
 			#cv2.imshow("original", clone_im)
 
@@ -119,6 +146,13 @@ while True:
 			
 			clone = images[cont].copy()
 			cv2.rectangle(clone, util.refPt[0], util.refPt[1], (0, 255, 0), 1)
+
+			list_names = map(lambda x: x["name"], cropped_js)
+			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			
+			if actual_img_name in list_names:
+				cv2.putText(clone,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
 			cv2.imshow("cropper", clone)
 
 		except Exception as e:
@@ -142,10 +176,16 @@ while True:
 		#bbox_portion = bbox[min_images:max_images]
 
 		try:
-			actual_im = images[cont]
+			actual_im = images[cont].copy()
 			#clone_im = images[cont].copy()
 			#bbox_im = bbox_portion[cont]
 			#cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
+			list_names = map(lambda x: x["name"], cropped_js)
+			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			
+			if actual_img_name in list_names:
+				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
 			cv2.imshow("cropper", actual_im)
 			#cv2.imshow("original", clone_im)
 
@@ -172,10 +212,16 @@ while True:
 		#bbox_portion = bbox[min_images:max_images]
 
 		try:
-			actual_im = images[cont]
+			actual_im = images[cont].copy()
 			#clone_im = images[cont].copy()
 			#bbox_im = bbox_portion[cont]
-			cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
+			#cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
+			list_names = map(lambda x: x["name"], cropped_js)
+			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			
+			if actual_img_name in list_names:
+				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
 			cv2.imshow("cropper", actual_im)
 			#cv2.imshow("original", clone_im)
 
@@ -209,61 +255,86 @@ while True:
 				if im_name+im_extension not in list_names:
 					cropped_js.append({"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2})
 				else:
-					option = raw_input("existing image. Do you want to overwrite it? (y/n): ")
-					if option.lower() == 'y':
+					print "existing image. Do you want to overwrite it? (w/esc): "
+					
+					if cv2.waitKey(0) == ord("w"):
 						ind = list_names.index(im_name+im_extension)
 						cropped_js[ind] = {"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2}
 				
 				json.dump(cropped_js, open(js["cropped_js"].encode(), "w"))
 				cv2.destroyWindow("aux")
 				print "coords of the image " + im_dir + " saved"
+				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+				cv2.imshow("cropper", actual_im)
+			
 			else:
-				util.refPt = []
 				cv2.destroyWindow("aux")
-				cv2.imshow("cropper", images[cont])
+				actual_im = images[cont].copy()
+				list_names = map(lambda x: x["name"], cropped_js)
+				actual_img_name = images_path[cont+min_images].split('/')[-1]
+				
+				if actual_img_name in list_names:
+					cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
+				cv2.imshow("cropper", actual_im)
 
 		except Exception as ex:
 			print "Failed to crop and save. Exception: ", ex
-	
-	
-	# no bbox
-	# elif key == ord("o"): #save the original crop
-	# 	try:
-	# 		bbox_im = bbox_portion[cont]
-	# 		x1, y1 = bbox_im.pt1
-	# 		x2, y2 = bbox_im.pt2
 
-	# 		crop = images[cont][y1:y2, x1:x2]
-
-	# 		cv2.imshow("aux", images[cont][y1:y2, x1:x2])
-	# 		aux_key = cv2.waitKey(0)
-	# 		im_dir = images_path[cont+min_images]
-	# 		im_name = im_dir.split(js["db_dir"].encode())[-1][1:-4]
-	# 		im_extension = ".png"
-	# 		save_dir = js["cropped_dir"].encode()+im_name+"_cropped"+im_extension
+	if key == ord("q"): # delete saved coords from json
+		try:
 			
-	# 		if aux_key == util.key_enter:
-	# 			print "original coords of the crop saved. image " + save_dir
-	# 			# cv2.imwrite(save_dir, crop)
-				
-	# 			list_names = map(lambda x: x["name"], cropped_js)
+			im_dir = images_path[cont+min_images]
+			im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
+			im_extension = ".png"
+			list_names = map(lambda x: x["name"], cropped_js)
+			
+			print "Do you want to erase the coords of", im_name+im_extension+" ?. Press again Q"
 
-	# 			if im_name+im_extension not in list_names:
-	# 				cropped_js.append({"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2})
-	# 			else:
-	# 				option = raw_input("existing image. Do you want to overwrite it? (y/n): ")
-	# 				if option.lower() == 'y':
-	# 					ind = list_names.index(im_name+im_extension)
-	# 					cropped_js[ind] = {"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2}
-				
-	# 			json.dump(cropped_js, open(js["cropped_js"].encode(), "w"))
-	# 			cv2.destroyWindow("aux")
-	# 		else:
-	# 			cv2.destroyWindow("aux")
-	# 			cv2.imshow("cropper", images[cont])
+			if cv2.waitKey(0) == ord("q"):
+				if im_name+im_extension in list_names:
+					index = list_names.index(im_name+im_extension)
+					del cropped_js[index]
+					del list_names[index]
+					print "coords of the image " + im_dir + " deleted"
+					cv2.imshow("cropper", images[cont].copy())
 
-	# 	except Exception as ex:
-	# 		print "Failed to crop and save. Exception: ", ex
+				else:
+					print "There is no", im_name+im_extension+" coords"
+	
+			actual_im = images[cont].copy()
+			json.dump(cropped_js, open(js["cropped_js"].encode(), "w"))
+			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			
+			if actual_img_name in list_names:
+				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
+			cv2.imshow("cropper", actual_im)
+
+		except Exception as ex:
+			print "Something gone wrong!. Exception:", ex
+	
+	if key == ord("e"):
+		try:
+			
+			im_dir = images_path[cont+min_images]
+			im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
+			im_extension = ".png"
+			list_names = map(lambda x: x["name"], cropped_js)
+			clone = images[cont].copy()
+
+			if im_name+im_extension in list_names:
+				index = list_names.index(im_name+im_extension)
+				img_obj = cropped_js[index]
+				cv2.putText(clone, "saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+				cv2.rectangle(clone, (img_obj["x1"], img_obj["y1"]), (img_obj["x2"], img_obj["y2"]), (0, 255, 0), 1)
+			else:
+				print "There are no coords for this image"
+			
+			cv2.imshow("cropper", clone)
+
+		except Exception as ex:
+			print "Something gone wrong!. Exception:", ex
 	
 	elif key == util.key_esc: # escape
 		js["last_cont"] = cont
@@ -278,14 +349,15 @@ while True:
 
 """
 instructions:
-the "original" window is just to see the pre-crop did by someone else
-the "cropper" is our possible crop
 
-### left-right arrow => move trhough images list ### not even more ###
-a - d keys => move through images list
-mouse rectangle => se puede dibujar un cuadrado manteniendo presionado el click y soltandolo en otro lugar, luego presionar S
+if the image coords exists, it will be written "saved" on the top
+
+a - d keys => move through images list. The drawn square persist
+mouse rectangle => you can draw a square by holding the click button and releasing it in another place of the window, 
+				   then press 's' key to show the drawn square
 s key => show drawn square
-r key => reset drawn squares
+r key => reset drawn square
+q key => delete the coords of the actual image if them exists
 m key => load more images (base specified)
 u key => load previous images (base specified)
 o key => save original crop
@@ -293,6 +365,9 @@ o key => save original crop
 w key => crop and save the image
 	  => in the new window, w save the image, another key goes out
 	  => if the image exists, check the console to confirm the overwrite
+	  	 => if you want to overwrite, in the new window press w
+	  	 	else, press another key
+e key => if the image coords are saved/exists, pressing the 'e' key will show the actual crop
 esc key => quit without save
 
 remember json:

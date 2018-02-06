@@ -322,6 +322,27 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 		except Exception as ex:
 			print "Something gone wrong!. Exception:", ex
 
+	elif key == ord("c"):
+		try:
+			
+			im_dir = images_path[cont+min_images]
+			im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
+			im_extension = ".png"
+			list_names = map(lambda x: x["name"], cropped_js)
+			actual_im = images[cont].copy()
+
+			if im_name+im_extension in list_names:
+				index = list_names.index(im_name+im_extension)
+				img_obj = cropped_js[index]
+				refPt = [(img_obj["x1"], img_obj["y1"])]
+				sel_rect_endpoint = [(img_obj["x2"], img_obj["y2"])]
+				print "copied coords"
+			else:
+				print "There are no coords for this image"
+
+		except Exception as ex:
+			print "Something gone wrong!. Exception:", ex
+
 	elif key == ord("x"):
 		js["last_cont"] = cont
 		js["min_images"] = min_images
@@ -334,7 +355,7 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 		js["min_images"] = min_images
 		js["max_images"] = max_images
 		json.dump(js, open("db.json", "w"))
-		print "db saved!"
+		print "exiting, bye!"
 		break
 
 if cv2.getWindowProperty("cropper", 0) <= 0:
@@ -343,7 +364,7 @@ if cv2.getWindowProperty("cropper", 0) <= 0:
 	js["max_images"] = max_images
 	json.dump(js, open("db.json", "w"))
 	cv2.destroyAllWindows()
-	print "\nbye"
+	print "bye!"
 
 
 
@@ -353,8 +374,7 @@ instructions:
 if the image coords exists, it will be written "saved" on the top
 
 a - d keys => move through images list. The drawn square persists
-mouse rectangle => you can draw a square by holding the click button and releasing it in another place of the window, 
-				   then press 's' key to show the drawn square
+mouse => you can draw a square by holding the click button and releasing it in another place of the window, 
 s key => show drawn square
 r key => reset drawn square
 q key => delete the coords of the actual image if them exists
@@ -363,14 +383,13 @@ u key => load previous images (base specified)
 w key => crop and save the image
 	  => in the new window, w save the image, another key goes out
 	  => if the image exists, check the console to confirm the overwrite
-	  	 => if you want to overwrite, in the new window press w
-	  	 	else, press another key
+	  	 => if you want to overwrite, in the new window press again 'w' key. Else, press another key
 e key => if the image coords are saved/exists, pressing the 'e' key will show the actual crop
 x key => save db data
+c key => if the actual image have a drawn square, the coords can be copied pressing the 'c' key to be used in another image
 exit app => save db data too
 
 remember json:
-	- cropped_dir: where cropped images are going to be saved
 	- db_dir: dir of the images
 	- img_crops.json must be an array
 

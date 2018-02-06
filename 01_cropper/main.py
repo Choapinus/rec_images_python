@@ -46,9 +46,10 @@ actual_im = images[cont].copy()
 
 list_names = map(lambda x: x["name"], cropped_js)
 actual_img_name = images_path[cont+min_images].split('/')[-1]
+cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 
 if actual_img_name in list_names:
-	cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+	cv2.putText(actual_im,"saved", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 
 
 cv2.setMouseCallback("cropper", util.click_and_crop)
@@ -64,7 +65,7 @@ while True:
 	key = cv2.waitKey(0)
 	
 	#if key == util.key_right:
-	if key == util.key_d:
+	if key == util.key_d or key == util.key_right:
 		cont += 1
 		if cont == len(images):
 			cont = 0 # ni se te ocurra poner = min_images porque explota, recuerda que sobreescribes la lista
@@ -74,23 +75,25 @@ while True:
 			#bbox_im = bbox_portion[cont]
 			#cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
 			list_names = map(lambda x: x["name"], cropped_js)
-			actual_img_name = images_path[cont+min_images].split('/')[-1]
-			
+			actual_img_name = images_path[cont+min_images].split('/')[-1] 
+			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
 			if actual_img_name in list_names:
-				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+				cv2.putText(actual_im, "saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 
 			cv2.imshow("cropper", actual_im)
 			#cv2.imshow("original", clone_im)
 
-		except Exception:
+		except Exception as ex:
 			print "error: no image found at index", str(cont)
 			print images[cont]
+			print "Exception:", ex
 			#print bbox_portion[cont]
 
 		#util.refPt = []
 	
 	#elif key == util.key_left:
-	elif key == util.key_a:
+	elif key == util.key_a or key == util.key_left:
 		cont -= 1
 		if cont == -1:
 			cont = len(images)-1
@@ -99,6 +102,7 @@ while True:
 			#clone_im = images[cont].copy()
 			#bbox_im = bbox_portion[cont]
 			#cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
+			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			list_names = map(lambda x: x["name"], cropped_js)
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
 			
@@ -125,6 +129,7 @@ while True:
 			#cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
 			list_names = map(lambda x: x["name"], cropped_js)
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			
 			if actual_img_name in list_names:
 				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
@@ -149,6 +154,7 @@ while True:
 
 			list_names = map(lambda x: x["name"], cropped_js)
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			
 			if actual_img_name in list_names:
 				cv2.putText(clone,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
@@ -182,6 +188,7 @@ while True:
 			#cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
 			list_names = map(lambda x: x["name"], cropped_js)
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			
 			if actual_img_name in list_names:
 				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
@@ -218,6 +225,7 @@ while True:
 			#cv2.rectangle(clone_im, bbox_im.pt1, bbox_im.pt2, (0, 255, 0), 1)
 			list_names = map(lambda x: x["name"], cropped_js)
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			
 			if actual_img_name in list_names:
 				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
@@ -264,7 +272,8 @@ while True:
 				json.dump(cropped_js, open(js["cropped_js"].encode(), "w"))
 				cv2.destroyWindow("aux")
 				print "coords of the image " + im_dir + " saved"
-				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+				cv2.putText(actual_im,"saved", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+				cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 				cv2.imshow("cropper", actual_im)
 			
 			else:
@@ -274,6 +283,7 @@ while True:
 				actual_img_name = images_path[cont+min_images].split('/')[-1]
 				
 				if actual_img_name in list_names:
+					cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 					cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 
 				cv2.imshow("cropper", actual_im)
@@ -288,16 +298,20 @@ while True:
 			im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
 			im_extension = ".png"
 			list_names = map(lambda x: x["name"], cropped_js)
+
+			assert im_name+im_extension in list_names
 			
 			print "Do you want to erase the coords of", im_name+im_extension+" ?. Press again Q"
 
 			if cv2.waitKey(0) == ord("q"):
 				if im_name+im_extension in list_names:
+					clone_copy = images[cont].copy()
 					index = list_names.index(im_name+im_extension)
 					del cropped_js[index]
 					del list_names[index]
 					print "coords of the image " + im_dir + " deleted"
-					cv2.imshow("cropper", images[cont].copy())
+					cv2.putText(clone_copy, str(cont+1), (clone_copy.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+					cv2.imshow("cropper", clone_copy)
 
 				else:
 					print "There is no", im_name+im_extension+" coords"
@@ -308,6 +322,7 @@ while True:
 			
 			if actual_img_name in list_names:
 				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+				cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 
 			cv2.imshow("cropper", actual_im)
 
@@ -327,6 +342,7 @@ while True:
 				index = list_names.index(im_name+im_extension)
 				img_obj = cropped_js[index]
 				cv2.putText(clone, "saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+				cv2.putText(clone, str(cont+1), (clone.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 				cv2.rectangle(clone, (img_obj["x1"], img_obj["y1"]), (img_obj["x2"], img_obj["y2"]), (0, 255, 0), 1)
 			else:
 				print "There are no coords for this image"
@@ -352,7 +368,7 @@ instructions:
 
 if the image coords exists, it will be written "saved" on the top
 
-a - d keys => move through images list. The drawn square persist
+a - d keys => move through images list. The drawn square persists
 mouse rectangle => you can draw a square by holding the click button and releasing it in another place of the window, 
 				   then press 's' key to show the drawn square
 s key => show drawn square
@@ -360,8 +376,6 @@ r key => reset drawn square
 q key => delete the coords of the actual image if them exists
 m key => load more images (base specified)
 u key => load previous images (base specified)
-o key => save original crop
-	  => if the image exists, check the console to confirm the overwrite
 w key => crop and save the image
 	  => in the new window, w save the image, another key goes out
 	  => if the image exists, check the console to confirm the overwrite

@@ -61,8 +61,11 @@ def img_list(folder_dir):
 	true_list_path = []
 	for path in os.listdir(folder_dir):
 		aux_path = os.path.join(folder_dir, path)
-		if os.path.isfile(aux_path) and "image" in guess_type(aux_path)[0]:
-			true_list_path.append(aux_path)
+		try:
+			if os.path.isfile(aux_path) and "image" in guess_type(aux_path)[0]:
+				true_list_path.append(aux_path)
+		except TypeError as tp:
+			pass
 	return true_list_path
 
 def get_images(images_dir):

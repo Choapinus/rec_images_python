@@ -4,11 +4,8 @@ TODO: 	- representar la data y dibujar los rectangulos antes # done
 		- dibujar mas de un rectangulo para una imagen # necesario?
 idea: if waitkey == somekey, x: x rectangulos a dibujar con un for i in range(x)
 
-parametrizar carga de bboxes
 crear archivo de instrucciones
-no depender de la base de datos celebA
 
-hacer los clicks para tener las coordenadas, no arrastrar
 """
 
 

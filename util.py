@@ -3,12 +3,19 @@ from numpy import empty
 from cv2 import (
 	imread,
 	cvtColor,
-	COLOR_RGB2GRAY,
-	EVENT_LBUTTONDOWN,
-	EVENT_LBUTTONUP
+	COLOR_RGB2GRAY
 )
 from mimetypes import guess_type
 
+key_up = 2490368
+key_right = 2555904
+key_down = 2621440
+key_left = 2424832
+key_enter = 13
+key_esc = 27
+key_a = 97
+key_d = 100
+key_w = 119
 
 class Bbox(object):
 	#(x, y), (x+w, y+h)
@@ -82,39 +89,3 @@ def get_one_image(image_dir):
 
 def to_bw(image):
 	return cvtColor(image, COLOR_RGB2GRAY)
-
-
-refPt = [] # initialize the list of reference points and boolean indicating
-cropping = False # whether cropping is being performed or not
-
-key_up = 2490368
-key_right = 2555904
-key_down = 2621440
-key_left = 2424832
-key_enter = 13
-key_esc = 27
-key_a = 97
-key_d = 100
-key_w = 119
- 
-def click_and_crop(event, x, y, flags, param):
-	
-	# grab references to the global variables
-	global refPt, cropping
-
-	# if the left mouse button was clicked, record the starting
-	# (x, y) coordinates and indicate that cropping is being
-	# performed
-	if event == EVENT_LBUTTONDOWN:
-	#if event == EVENT_LBUTTONDOWN and len(refPt) == 0:
-		refPt = [(x, y)]
-		cropping = True
- 
-	# check to see if the left mouse button was released
-	elif event == EVENT_LBUTTONUP:
-	# elif event == EVENT_LBUTTONDOWN and len(refPt) > 0:
-		# record the ending (x, y) coordinates and indicate that
-		# the cropping operation is finished
-		refPt.append((x, y))
-		#print refPt
-		cropping = False

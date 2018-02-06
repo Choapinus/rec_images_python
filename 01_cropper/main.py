@@ -8,7 +8,6 @@ crear archivo de instrucciones
 
 """
 
-
 import sys
 
 sys.path.insert(0, '../') #dir of the module util
@@ -19,6 +18,26 @@ import json
 import util
 import numpy as np
 
+refPt = [] # initialize the list of reference points and boolean indicating
+cropping = False # whether cropping is being performed or not
+sel_rect_endpoint = []
+
+def click_and_drag(event, x, y, flags, param):
+	global refPt, cropping, sel_rect_endpoint
+ 
+	if event == cv2.EVENT_LBUTTONDOWN:
+		refPt = [(x, y)]
+		cropping = True
+
+	elif event == cv2.EVENT_MOUSEMOVE and cropping:
+		sel_rect_endpoint = [(x, y)]
+		actual_im = images[cont].copy()
+		cv2.rectangle(actual_im, refPt[0], sel_rect_endpoint[0], (0, 255, 0), 1)
+		cv2.imshow('cropper', actual_im)
+
+	elif event == cv2.EVENT_LBUTTONUP:
+		cropping = False
+
 js = json.load(open("db.json"))
 
 base = js["base"]
@@ -26,7 +45,7 @@ cont = js["last_cont"] # save this, indica el contador de imagenes en donde qued
 min_images = js["min_images"]
 max_images = js["max_images"]
 
-# print "loading..."
+print "loading..."
 
 if not os.path.isfile(js["cropped_js"].encode()):
 	file(js["cropped_js"].encode(), 'w').write('[]')
@@ -46,8 +65,9 @@ cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHE
 if actual_img_name in list_names:
 	cv2.putText(actual_im,"saved", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 
-cv2.setMouseCallback("cropper", util.click_and_crop)
+cv2.setMouseCallback("cropper", click_and_drag)
 cv2.imshow("cropper", actual_im)
+
 
 while cv2.getWindowProperty("cropper", 0) >= 0:
 	print "imagen:", images_path[cont+min_images]
@@ -96,7 +116,7 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 	elif key == ord("r"):
 		# resetear a valores originales
 		try:
-			util.refPt = []
+			refPt = []
 			actual_im = images[cont].copy()
 			list_names = map(lambda x: x["name"], cropped_js)
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
@@ -115,11 +135,11 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 	elif key == ord("s"): # show changes
 		try:
 			clone = images[cont].copy()
-			cv2.rectangle(clone, util.refPt[0], util.refPt[1], (0, 255, 0), 1)
+			cv2.rectangle(clone, refPt[0], sel_rect_endpoint[0], (0, 255, 0), 1)
 
 			list_names = map(lambda x: x["name"], cropped_js)
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
-			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+			cv2.putText(clone, str(cont+1), (clone.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			
 			if actual_img_name in list_names:
 				cv2.putText(clone,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
@@ -127,7 +147,7 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 			cv2.imshow("cropper", clone)
 
 		except Exception as e:
-			print "no coords given. refPt:", util.refPt 
+			print "no coords given. refPt:", refPt 
 
 	elif key == ord("m"): # load more
 		min_images += base
@@ -196,11 +216,10 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 	elif key == util.key_w:
 		# guardar nombre x1 y1 x2 y2
 		try:
-			x1, y1 = util.refPt[0]
-			x2, y2 = util.refPt[1]
+			x1, y1 = refPt[0]
+			x2, y2 = sel_rect_endpoint[0]
 			
 			crop = images[cont][y1:y2, x1:x2]
-			
 			cv2.imshow("aux", images[cont][y1:y2, x1:x2])
 			aux_key = cv2.waitKey(0)
 			im_dir = images_path[cont+min_images]
@@ -234,9 +253,9 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 				actual_img_name = images_path[cont+min_images].split('/')[-1]
 				
 				if actual_img_name in list_names:
-					cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 					cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 
+				cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 				cv2.imshow("cropper", actual_im)
 
 		except Exception as ex:
@@ -273,8 +292,8 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 			
 			if actual_img_name in list_names:
 				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
-				cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
-
+			
+			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			cv2.imshow("cropper", actual_im)
 
 		except Exception as ex:
@@ -287,18 +306,18 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 			im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
 			im_extension = ".png"
 			list_names = map(lambda x: x["name"], cropped_js)
-			clone = images[cont].copy()
+			actual_im = images[cont].copy()
 
 			if im_name+im_extension in list_names:
 				index = list_names.index(im_name+im_extension)
 				img_obj = cropped_js[index]
-				cv2.putText(clone, "saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
-				cv2.putText(clone, str(cont+1), (clone.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
-				cv2.rectangle(clone, (img_obj["x1"], img_obj["y1"]), (img_obj["x2"], img_obj["y2"]), (0, 255, 0), 1)
+				cv2.putText(actual_im, "saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+				cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+15, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+				cv2.rectangle(actual_im, (img_obj["x1"], img_obj["y1"]), (img_obj["x2"], img_obj["y2"]), (0, 255, 0), 1)
 			else:
 				print "There are no coords for this image"
 			
-			cv2.imshow("cropper", clone)
+			cv2.imshow("cropper", actual_im)
 
 		except Exception as ex:
 			print "Something gone wrong!. Exception:", ex

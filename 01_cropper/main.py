@@ -59,7 +59,7 @@ cv2.imshow("cropper", actual_im)
 
 
 
-while True:
+while cv2.getWindowProperty("cropper", 0) >= 0:
 	print "imagen:", images_path[cont+min_images]
 
 	key = cv2.waitKey(0)
@@ -291,7 +291,7 @@ while True:
 		except Exception as ex:
 			print "Failed to crop and save. Exception: ", ex
 
-	if key == ord("q"): # delete saved coords from json
+	elif key == ord("q"): # delete saved coords from json
 		try:
 			
 			im_dir = images_path[cont+min_images]
@@ -329,7 +329,7 @@ while True:
 		except Exception as ex:
 			print "Something gone wrong!. Exception:", ex
 	
-	if key == ord("e"):
+	elif key == ord("e"):
 		try:
 			
 			im_dir = images_path[cont+min_images]
@@ -351,17 +351,26 @@ while True:
 
 		except Exception as ex:
 			print "Something gone wrong!. Exception:", ex
-	
-	elif key == util.key_esc: # escape
+
+
+	#elif key == util.key_esc: # escape
+	elif key == ord("x"):
 		js["last_cont"] = cont
 		js["min_images"] = min_images
 		js["max_images"] = max_images
 		json.dump(js, open("db.json", "w"))
-		#json.dump(cropped_js, open(js["cropped_js"].encode(), "w"))
-		cv2.destroyAllWindows()
+		print "db saved!"
 
-		print "\nbye"
-		break
+if cv2.getWindowProperty("cropper", 0) <= 0:
+	js["last_cont"] = cont
+	js["min_images"] = min_images
+	js["max_images"] = max_images
+	json.dump(js, open("db.json", "w"))
+	cv2.destroyAllWindows()
+
+	print "\nbye"
+
+
 
 """
 instructions:
@@ -382,7 +391,8 @@ w key => crop and save the image
 	  	 => if you want to overwrite, in the new window press w
 	  	 	else, press another key
 e key => if the image coords are saved/exists, pressing the 'e' key will show the actual crop
-esc key => quit without save
+x key => save db data
+exit app => save db data too
 
 remember json:
 	- cropped_dir: where cropped images are going to be saved

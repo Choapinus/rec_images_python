@@ -16,7 +16,12 @@ import os
 import cv2
 import json
 import util
+import argparse
 import numpy as np
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-b', '--bbox', help="show stored bboxes", action="store_true")
+args = parser.parse_args()
 
 refPt = [] # initialize the list of reference points and boolean indicating
 cropping = False # whether cropping is being performed or not
@@ -38,17 +43,67 @@ def click_and_drag(event, x, y, flags, param):
 	elif event == cv2.EVENT_LBUTTONUP:
 		cropping = False
 
+def save_w():
+	try:
+		global actual_im
+		x1, y1 = refPt[0]
+		x2, y2 = sel_rect_endpoint[0]
+		
+		crop = images[cont][y1:y2, x1:x2]
+		cv2.imshow("aux", images[cont][y1:y2, x1:x2])
+		aux_key = cv2.waitKey(0)
+		im_dir = images_path[cont+min_images]
+		im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
+		im_extension = ".png"
+		
+		if aux_key == ord("d"):
+			
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
+
+			if im_name+im_extension not in list_names:
+				cropped_js["coords"].append({"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2})
+			else:
+				print "existing image. Do you want to overwrite it? (w/esc): "
+				
+				if cv2.waitKey(0) == ord("d"):
+					ind = list_names.index(im_name+im_extension)
+					cropped_js["coords"][ind] = {"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2}
+			
+			json.dump(cropped_js, open(js["cropped_js"].encode(), "w"))
+			cv2.destroyWindow("aux")
+			print "coords of the image " + im_dir + " saved"
+			cv2.putText(actual_im,"saved", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+			cv2.imshow("cropper", actual_im)
+		
+		else:
+			cv2.destroyWindow("aux")
+			actual_im = images[cont].copy()
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
+			actual_img_name = images_path[cont+min_images].split('/')[-1]
+			
+			if actual_img_name in list_names:
+				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
+			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+			cv2.imshow("cropper", actual_im)
+
+	except Exception as ex:
+		print "Failed to crop and save. Exception: ", ex
+
+
 js = json.load(open("db.json"))
 
 base = js["base"]
 cont = js["last_cont"] # save this, indica el contador de imagenes en donde quedaste
 min_images = js["min_images"]
 max_images = js["max_images"]
+flag = False
 
 print "loading..."
 
 if not os.path.isfile(js["cropped_js"].encode()):
-	file(js["cropped_js"].encode(), 'w').write('[]')
+	file(js["cropped_js"].encode(), 'w').write('{"coords": []}')
 
 cropped_js = json.load(open(js["cropped_js"].encode()))
 images_path = util.img_list(js["db_dir"].encode())
@@ -58,7 +113,7 @@ images = util.get_images(images_path[min_images:max_images])
 cv2.namedWindow("cropper")
 actual_im = images[cont].copy()
 
-list_names = map(lambda x: x["name"], cropped_js)
+list_names = map(lambda x: x["name"], cropped_js["coords"])
 actual_img_name = images_path[cont+min_images].split('/')[-1]
 cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 
@@ -73,19 +128,33 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 	print "imagen:", images_path[cont+min_images]
 
 	key = cv2.waitKey(0)
+
+	if key == ord("f"):
+		if flag:
+			flag = False
+			print "flag off"
+		else:
+			flag = True
+			print "flag on"
 	
 	if key == util.key_d or key == util.key_right:
+		if flag: save_w()
 		cont += 1
 		if cont == len(images):
 			cont = 0 # ni se te ocurra poner = min_images porque explota, recuerda que sobreescribes la lista
 		try:
 			actual_im = images[cont].copy()
-			list_names = map(lambda x: x["name"], cropped_js)
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
 			actual_img_name = images_path[cont+min_images].split('/')[-1] 
 			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 
 			if actual_img_name in list_names:
 				cv2.putText(actual_im, "saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
+				if args.bbox:
+					index = list_names.index(actual_img_name)
+					img_obj = cropped_js["coords"][index]
+					cv2.rectangle(actual_im, (img_obj["x1"], img_obj["y1"]), (img_obj["x2"], img_obj["y2"]), (0, 255, 0), 1)
 
 			cv2.imshow("cropper", actual_im)
 
@@ -101,11 +170,16 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 		try:
 			actual_im = images[cont].copy()
 			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
-			list_names = map(lambda x: x["name"], cropped_js)
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
 			
 			if actual_img_name in list_names:
 				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
+				if args.bbox:
+					index = list_names.index(actual_img_name)
+					img_obj = cropped_js["coords"][index]
+					cv2.rectangle(actual_im, (img_obj["x1"], img_obj["y1"]), (img_obj["x2"], img_obj["y2"]), (0, 255, 0), 1)
 
 			cv2.imshow("cropper", actual_im)
 
@@ -118,7 +192,7 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 		try:
 			refPt = []
 			actual_im = images[cont].copy()
-			list_names = map(lambda x: x["name"], cropped_js)
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
 			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			
@@ -137,7 +211,7 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 			clone = images[cont].copy()
 			cv2.rectangle(clone, refPt[0], sel_rect_endpoint[0], (0, 255, 0), 1)
 
-			list_names = map(lambda x: x["name"], cropped_js)
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
 			cv2.putText(clone, str(cont+1), (clone.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			
@@ -167,12 +241,17 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 
 		try:
 			actual_im = images[cont].copy()
-			list_names = map(lambda x: x["name"], cropped_js)
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
 			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			
 			if actual_img_name in list_names:
 				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
+				if args.bbox:
+					index = list_names.index(actual_img_name)
+					img_obj = cropped_js["coords"][index]
+					cv2.rectangle(actual_im, (img_obj["x1"], img_obj["y1"]), (img_obj["x2"], img_obj["y2"]), (0, 255, 0), 1)
 
 			cv2.imshow("cropper", actual_im)
 
@@ -199,12 +278,17 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 
 		try:
 			actual_im = images[cont].copy()
-			list_names = map(lambda x: x["name"], cropped_js)
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
 			actual_img_name = images_path[cont+min_images].split('/')[-1]
 			cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 			
 			if actual_img_name in list_names:
 				cv2.putText(actual_im,"saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
+
+				if args.bbox:
+					index = list_names.index(actual_img_name)
+					img_obj = cropped_js["coords"][index]
+					cv2.rectangle(actual_im, (img_obj["x1"], img_obj["y1"]), (img_obj["x2"], img_obj["y2"]), (0, 255, 0), 1)
 
 			cv2.imshow("cropper", actual_im)
 
@@ -226,18 +310,18 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 			im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
 			im_extension = ".png"
 			
-			if aux_key == util.key_w:
+			if aux_key == ord("w"):
 				
-				list_names = map(lambda x: x["name"], cropped_js)
+				list_names = map(lambda x: x["name"], cropped_js["coords"])
 
 				if im_name+im_extension not in list_names:
-					cropped_js.append({"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2})
+					cropped_js["coords"].append({"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2})
 				else:
 					print "existing image. Do you want to overwrite it? (w/esc): "
 					
 					if cv2.waitKey(0) == ord("w"):
 						ind = list_names.index(im_name+im_extension)
-						cropped_js[ind] = {"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2}
+						cropped_js["coords"][ind] = {"name": im_name+im_extension, "x1": x1, "x2": x2, "y1": y1, "y2": y2}
 				
 				json.dump(cropped_js, open(js["cropped_js"].encode(), "w"))
 				cv2.destroyWindow("aux")
@@ -249,7 +333,7 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 			else:
 				cv2.destroyWindow("aux")
 				actual_im = images[cont].copy()
-				list_names = map(lambda x: x["name"], cropped_js)
+				list_names = map(lambda x: x["name"], cropped_js["coords"])
 				actual_img_name = images_path[cont+min_images].split('/')[-1]
 				
 				if actual_img_name in list_names:
@@ -260,14 +344,14 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 
 		except Exception as ex:
 			print "Failed to crop and save. Exception: ", ex
-
+		
 	elif key == ord("q"): # delete saved coords from json
 		try:
 			
 			im_dir = images_path[cont+min_images]
 			im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
 			im_extension = ".png"
-			list_names = map(lambda x: x["name"], cropped_js)
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
 
 			assert im_name+im_extension in list_names
 			
@@ -277,7 +361,7 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 				if im_name+im_extension in list_names:
 					clone_copy = images[cont].copy()
 					index = list_names.index(im_name+im_extension)
-					del cropped_js[index]
+					del cropped_js["coords"][index]
 					del list_names[index]
 					print "coords of the image " + im_dir + " deleted"
 					cv2.putText(clone_copy, str(cont+1), (clone_copy.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
@@ -305,12 +389,12 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 			im_dir = images_path[cont+min_images]
 			im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
 			im_extension = ".png"
-			list_names = map(lambda x: x["name"], cropped_js)
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
 			actual_im = images[cont].copy()
 
 			if im_name+im_extension in list_names:
 				index = list_names.index(im_name+im_extension)
-				img_obj = cropped_js[index]
+				img_obj = cropped_js["coords"][index]
 				cv2.putText(actual_im, "saved", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 				cv2.putText(actual_im, str(cont+1), (actual_im.shape[0]+5, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (47, 0, 232))
 				cv2.rectangle(actual_im, (img_obj["x1"], img_obj["y1"]), (img_obj["x2"], img_obj["y2"]), (0, 255, 0), 1)
@@ -328,12 +412,12 @@ while cv2.getWindowProperty("cropper", 0) >= 0:
 			im_dir = images_path[cont+min_images]
 			im_name = im_dir.split(js["db_dir"].encode())[-1].split('.')[0]
 			im_extension = ".png"
-			list_names = map(lambda x: x["name"], cropped_js)
+			list_names = map(lambda x: x["name"], cropped_js["coords"])
 			actual_im = images[cont].copy()
 
 			if im_name+im_extension in list_names:
 				index = list_names.index(im_name+im_extension)
-				img_obj = cropped_js[index]
+				img_obj = cropped_js["coords"][index]
 				refPt = [(img_obj["x1"], img_obj["y1"])]
 				sel_rect_endpoint = [(img_obj["x2"], img_obj["y2"])]
 				print "copied coords"
@@ -397,5 +481,6 @@ remember json:
 preguntas:
 - que pasa si en el clasificador de arandanos aparece una pelota morada?
 - todas las capturas de arandanos poseen rayas por detras. Estas intervendran en el reconocimiento?
+- seleccionar de abajo derecha hacia arriba izq lanza error, por que?
 
 """

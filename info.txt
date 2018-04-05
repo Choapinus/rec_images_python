@@ -12,3 +12,29 @@ bd: http://ieeexplore.ieee.org/Xplore/home.jsp
 
 http://www.sciencedirect.com/
 ScienceDirect is the world's leading source for scientific, technical, and medical research. Explore journals, books and articles.
+
+
+
+modelos de aprendizaje ligeros
+
+enet => 100 mb
+mobilnet => 5 mb
+squeezenet => 5mb
+
+
+buscar en pyimagesearch:
+- santa/no santa: https://www.pyimagesearch.com/2016/08/01/lenet-convolutional-neural-network-in-python/
+- detectores de rostros con deeplearning (entender la mecanica del codigo)
+
+
+buscar google:
+- red neuronal yolo
+
+
+SWIR = short wave-length infrared
+
+
+
+ideas:
+- detector de emociones
+- detector de estado (estresado)
